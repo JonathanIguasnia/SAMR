@@ -1,0 +1,334 @@
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+// Clase Paciente
+class Paciente {
+    private int ID;
+    private String Nombre;
+    private int Edad;
+    private String Dirección;
+    private String InformaciónMédica;
+    private String ContactoEmergencia;
+    private String Estado;
+    private List<MonitorMedico> monitores = new ArrayList<>();
+    private List<SolicitudAyuda> solicitudes = new ArrayList<>();
+    private HistorialClinico historial;
+
+    public Paciente(int ID, String Nombre, int Edad, String Dirección, String InformaciónMédica, String ContactoEmergencia, String Estado) {
+        this.ID = ID;
+        this.Nombre = Nombre;
+        this.Edad = Edad;
+        this.Dirección = Dirección;
+        this.InformaciónMédica = InformaciónMédica;
+        this.ContactoEmergencia = ContactoEmergencia;
+        this.Estado = Estado;
+        this.historial = new HistorialClinico(ID);
+    }
+
+    public void SolicitarAyuda(CentroAsistencia centro) {
+        SolicitudAyuda solicitud = new SolicitudAyuda(ID, LocalDateTime.now(), "Emergencia", "Pendiente", ID, -1);
+        solicitudes.add(solicitud);
+        centro.RecibirSolicitud(solicitud);
+    }
+
+    public void ActualizarInformacion(String nuevaInformacion) {
+        this.InformaciónMédica = nuevaInformacion;
+        historial.ActualizarHistorial("Información médica actualizada: " + nuevaInformacion);
+    }
+
+    public void agregarMonitor(MonitorMedico monitor) {
+        monitores.add(monitor);
+    }
+
+    public void setHistorial(HistorialClinico historial) {
+        this.historial = historial;
+    }
+
+    // Getters y Setters
+    public int getID() { return ID; }
+    public void setID(int ID) { this.ID = ID; }
+
+    public String getNombre() { return Nombre; }
+    public void setNombre(String Nombre) { this.Nombre = Nombre; }
+
+    public int getEdad() { return Edad; }
+    public void setEdad(int Edad) { this.Edad = Edad; }
+
+    public String getDirección() { return Dirección; }
+    public void setDirección(String Dirección) { this.Dirección = Dirección; }
+
+    public String getInformaciónMédica() { return InformaciónMédica; }
+    public void setInformaciónMédica(String InformaciónMédica) { this.InformaciónMédica = InformaciónMédica; }
+
+    public String getContactoEmergencia() { return ContactoEmergencia; }
+    public void setContactoEmergencia(String ContactoEmergencia) { this.ContactoEmergencia = ContactoEmergencia; }
+
+    public String getEstado() { return Estado; }
+    public void setEstado(String Estado) { this.Estado = Estado; }
+
+    public List<MonitorMedico> getMonitores() { return monitores; }
+    public void setMonitores(List<MonitorMedico> monitores) { this.monitores = monitores; }
+
+    public List<SolicitudAyuda> getSolicitudes() { return solicitudes; }
+    public void setSolicitudes(List<SolicitudAyuda> solicitudes) { this.solicitudes = solicitudes; }
+
+    public HistorialClinico getHistorial() { return historial; }
+}
+
+// Clase CentroAsistencia
+class CentroAsistencia {
+    private int ID;
+    private String Nombre;
+    private String Dirección;
+    private String Contacto;
+    private List<SolicitudAyuda> solicitudes = new ArrayList<>();
+    private List<ProfesionalSalud> profesionales = new ArrayList<>();
+
+    public CentroAsistencia(int ID, String Nombre, String Dirección, String Contacto) {
+        this.ID = ID;
+        this.Nombre = Nombre;
+        this.Dirección = Dirección;
+        this.Contacto = Contacto;
+    }
+
+    public void RecibirSolicitud(SolicitudAyuda solicitud) {
+        solicitudes.add(solicitud);
+        AsignarProfesional(solicitud);
+    }
+
+    public void AsignarProfesional(SolicitudAyuda solicitud) {
+        if (!profesionales.isEmpty()) {
+            solicitud.setProfesionalID(profesionales.get(0).getID());
+            solicitud.ActualizarEstado();
+        }
+    }
+
+    public void agregarProfesional(ProfesionalSalud profesional) {
+        profesionales.add(profesional);
+    }
+
+    // Getters y Setters
+    public int getID() { return ID; }
+    public void setID(int ID) { this.ID = ID; }
+
+    public String getNombre() { return Nombre; }
+    public void setNombre(String Nombre) { this.Nombre = Nombre; }
+
+    public String getDirección() { return Dirección; }
+    public void setDirección(String Dirección) { this.Dirección = Dirección; }
+
+    public String getContacto() { return Contacto; }
+    public void setContacto(String Contacto) { this.Contacto = Contacto; }
+
+    public List<SolicitudAyuda> getSolicitudes() { return solicitudes; }
+    public void setSolicitudes(List<SolicitudAyuda> solicitudes) { this.solicitudes = solicitudes; }
+
+    public List<ProfesionalSalud> getProfesionales() { return profesionales; }
+    public void setProfesionales(List<ProfesionalSalud> profesionales) { this.profesionales = profesionales; }
+}
+
+// Clase SolicitudAyuda
+class SolicitudAyuda {
+    private int ID;
+    private LocalDateTime FechaHora;
+    private String Tipo;
+    private String Estado;
+    private int PacienteID;
+    private int ProfesionalID;
+
+    public SolicitudAyuda(int ID, LocalDateTime FechaHora, String Tipo, String Estado, int PacienteID, int ProfesionalID) {
+        this.ID = ID;
+        this.FechaHora = FechaHora;
+        this.Tipo = Tipo;
+        this.Estado = Estado;
+        this.PacienteID = PacienteID;
+        this.ProfesionalID = ProfesionalID;
+    }
+
+    public void ActualizarEstado() {
+        this.Estado = "En Progreso";
+    }
+
+    public void GenerarRegistro() {
+        System.out.println("Registro de Solicitud: ID=" + ID + ", Estado=" + Estado);
+    }
+
+    public void setProfesionalID(int profesionalID) {
+        this.ProfesionalID = profesionalID;
+    }
+
+    // Getters y Setters
+    public int getID() { return ID; }
+    public void setID(int ID) { this.ID = ID; }
+
+    public LocalDateTime getFechaHora() { return FechaHora; }
+    public void setFechaHora(LocalDateTime FechaHora) { this.FechaHora = FechaHora; }
+
+    public String getTipo() { return Tipo; }
+    public void setTipo(String Tipo) { this.Tipo = Tipo; }
+
+    public String getEstado() { return Estado; }
+    public void setEstado(String Estado) { this.Estado = Estado; }
+
+    public int getPacienteID() { return PacienteID; }
+    public void setPacienteID(int PacienteID) { this.PacienteID = PacienteID; }
+
+    public int getProfesionalID() { return ProfesionalID; }
+    public void setProfesionalID(int ProfesionalID) { this.ProfesionalID = ProfesionalID; }
+}
+
+// Clase ProfesionalSalud
+class ProfesionalSalud {
+    private int ID;
+    private String Nombre;
+    private String Especialidad;
+    private String Contacto;
+
+    public ProfesionalSalud(int ID, String Nombre, String Especialidad, String Contacto) {
+        this.ID = ID;
+        this.Nombre = Nombre;
+        this.Especialidad = Especialidad;
+        this.Contacto = Contacto;
+    }
+
+    public void Diagnosticar() {
+        // Implementar lógica de diagnóstico
+    }
+
+    public void TratarPaciente() {
+        // Implementar lógica de tratamiento
+    }
+
+    // Getters y Setters
+    public int getID() { return ID; }
+    public void setID(int ID) { this.ID = ID; }
+
+    public String getNombre() { return Nombre; }
+    public void setNombre(String Nombre) { this.Nombre = Nombre; }
+
+    public String getEspecialidad() { return Especialidad; }
+    public void setEspecialidad(String Especialidad) { this.Especialidad = Especialidad; }
+
+    public String getContacto() { return Contacto; }
+    public void setContacto(String Contacto) { this.Contacto = Contacto; }
+}
+
+// Clase MonitorMedico
+class MonitorMedico {
+    private int ID;
+    private String Tipo;
+    private String LecturaActual;
+    private int PacienteID;
+
+    public MonitorMedico(int ID, String Tipo, String LecturaActual, int PacienteID) {
+        this.ID = ID;
+        this.Tipo = Tipo;
+        this.LecturaActual = LecturaActual;
+        this.PacienteID = PacienteID;
+    }
+
+    public void ObtenerLectura() {
+        // Implementar la lógica para obtener lectura
+    }
+
+    public void GenerarAlerta() {
+        // Implementar la lógica para generar alerta
+    }
+
+    // Getters y Setters
+    public int getID() { return ID; }
+    public void setID(int ID) { this.ID = ID; }
+
+    public String getTipo() { return Tipo; }
+    public void setTipo(String Tipo) { this.Tipo = Tipo; }
+
+    public String getLecturaActual() { return LecturaActual; }
+    public void setLecturaActual(String LecturaActual) { this.LecturaActual = LecturaActual; }
+
+    public int getPacienteID() { return PacienteID; }
+    public void setPacienteID(int PacienteID) { this.PacienteID = PacienteID; }
+}
+
+// Clase HistorialClinico
+class HistorialClinico {
+    private int PacienteID;
+    private List<String> detalles = new ArrayList<>();
+
+    public HistorialClinico(int PacienteID) {
+        this.PacienteID = PacienteID;
+    }
+
+    public void ActualizarHistorial(String detalle) {
+        detalles.add(detalle);
+    }
+
+    public void ConsultarHistorial() {
+        for (String detalle : detalles) {
+            System.out.println(detalle);
+        }
+    }
+
+    // Getters y Setters
+    public int getPacienteID() { return PacienteID; }
+    public void setPacienteID(int PacienteID) { this.PacienteID = PacienteID; }
+
+    public List<String> getDetalles() { return detalles; }
+    public void setDetalles(List<String> detalles) { this.detalles = detalles; }
+}
+
+// Clase Usuario
+class Usuario {
+    private int ID;
+    private String NombreUsuario;
+    private String Clave;
+    private String Rol;
+
+    public Usuario(int ID, String NombreUsuario, String Clave, String Rol) {
+        this.ID = ID;
+        this.NombreUsuario = NombreUsuario;
+        this.Clave = Clave;
+        this.Rol = Rol;
+    }
+
+    public void Autenticar() {
+        // Implementar lógica de autenticación
+    }
+
+    public void AsignarRol(String nuevoRol) {
+        this.Rol = nuevoRol;
+    }
+
+    // Getters y Setters
+    public int getID() { return ID; }
+    public void setID(int ID) { this.ID = ID; }
+
+    public String getNombreUsuario() { return NombreUsuario; }
+    public void setNombreUsuario(String NombreUsuario) { this.NombreUsuario = NombreUsuario; }
+
+    public String getClave() { return Clave; }
+    public void setClave(String Clave) { this.Clave = Clave; }
+
+    public String getRol() { return Rol; }
+    public void setRol(String Rol) { this.Rol = Rol; }
+}
+
+// Clase de prueba
+public class Main {
+    public static void main(String[] args) {
+        // Crear datos ficticios
+        Paciente paciente = new Paciente(1, "Juan Pérez", 30, "Calle Falsa 123", "Diabetes tipo 2", "123-456-789", "Estable");
+        CentroAsistencia centro = new CentroAsistencia(1, "Centro Médico ABC", "Avenida Siempre Viva 456", "987-654-321");
+        ProfesionalSalud profesional = new ProfesionalSalud(1, "Dr. María López", "Cardiología", "555-1234");
+        MonitorMedico monitor = new MonitorMedico(1, "Electrocardiograma", "Normal", paciente.getID());
+        
+        // Agregar datos y realizar operaciones
+        centro.agregarProfesional(profesional);
+        paciente.agregarMonitor(monitor);
+        paciente.SolicitarAyuda(centro);
+        paciente.ActualizarInformacion("Diabetes tipo 2, tratamiento actualizado");
+        
+        // Consultar el historial del paciente
+        paciente.getHistorial().ConsultarHistorial();
+    }
+}
